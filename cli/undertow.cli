@@ -1,0 +1,17 @@
+# SAMEORIGIN X-Frame restricts other x-frame header requests from other origins
+/subsystem=undertow/configuration=filter/response-header=x-frame-header:add(header-name="X-Frame-Options", header-value="SAMEORIGIN")
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=x-frame-header:add
+
+# SameSite Cookie for better CSRF prevention, both on http and https
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name="rfc6265-cookie-validation", value="true")
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name="allow-equals-in-cookie-value", value="true")
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name="allow-equals-in-cookie-value", value="true")
+/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name="rfc6265-cookie-validation", value="true")
+/subsystem=undertow/servlet-container=default/setting=session-cookie:write-attribute(name="comment", value="; SameSite=Strict")
+
+# Import anticors module
+module add --name=com.jayaprabahar.wildfly.filter.anticors --resources=${env.JBOSS_HOME}/module/anticorsfilter-1.0.1.jar --dependencies=javax.api,javax.transaction.api,javax.resource.api
+
+# Add Referer based HTTP Filter for Strict CSRF prevention
+/subsystem=undertow/configuration=filter/custom-filter=anticorsfilter:add(module=com.jayaprabahar.wildfly.filter.anticors, class-name=com.jayaprabahar.wildfly.filter.anticors.AntiCorsCustomFilter)
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=anticorsfilter:add
