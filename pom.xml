@@ -16,7 +16,7 @@
 		<java.version>11</java.version>
 		<apache.commons-lang3.version>3.9</apache.commons-lang3.version>
 		<projectlombok.version>1.18.10</projectlombok.version>
-		<undertow-core.version>2.0.26.Final</undertow-core.version>
+		<undertow-core.version>2.1.6.Final</undertow-core.version>
 	</properties>
 
 	<build>
